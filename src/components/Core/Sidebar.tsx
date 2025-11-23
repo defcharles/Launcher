@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
       animate={{ opacity: 1, transition: { duration: 0.6, ease: easeOut } }}
       className="
         fixed top-0 left-0 w-16 h-screen
-        bg-gray-500/5 bg-clip-padding backdrop-filter backdrop-blur-lg
+        bg-gray-500/5 bg-glass-noise bg-clip-padding backdrop-filter backdrop-blur-lg
          backdrop-saturate-100 backdrop-contrast-100
         shadow-xl flex flex-col justify-between items-center px-3 py-4
       "
