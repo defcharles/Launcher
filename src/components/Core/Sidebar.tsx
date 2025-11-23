@@ -1,15 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { GoHomeFill } from "react-icons/go";
 import { LibraryBig } from "lucide-react";
 import { TbSettings, TbLogout } from "react-icons/tb";
 import { motion, easeOut, AnimatePresence } from "framer-motion";
+import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import GlassContainer from "../Global/GlassContainer";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(e.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    window.addEventListener("mousedown", handler);
+    return () => window.removeEventListener("mousedown", handler);
+  }, []);
 
   const baseButton =
     "flex justify-center items-center w-10 h-10 rounded-md transition-all duration-300 cursor-pointer group";
@@ -27,7 +47,7 @@ const Sidebar: React.FC = () => {
       className="
         fixed top-0 left-0 w-16 h-screen
         bg-gray-500/5 bg-glass-noise bg-clip-padding backdrop-filter backdrop-blur-lg
-         backdrop-saturate-100 backdrop-contrast-100
+        backdrop-saturate-100 backdrop-contrast-100
         shadow-xl flex flex-col justify-between items-center px-3 py-4
       "
     >
@@ -79,28 +99,48 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex flex-col gap-3.5">
-        <div
-          className="relative"
-          onMouseEnter={() => setShowProfileMenu(true)}
-          onMouseLeave={() => setShowProfileMenu(false)}
+      <div className="relative" ref={profileRef}>
+        <button
+          onClick={() => setShowProfileMenu((prev) => !prev)}
+          className={`${baseButton} ${hoverButton} overflow-visible relative`}
         >
-          <button className={`${baseButton} ${hoverButton} overflow-hidden`}>
-            <img
-              src="https://cdn.discordapp.com/avatars/903815911830589462/843e986f0a518b1b7eab8f17424241ae.png?size=512"
-              alt="Profile"
-              className="w-8 h-8 rounded-md object-cover"
-              draggable={false}
-            />
-          </button>
+          <img
+            src="https://cdn.discordapp.com/avatars/903815911830589462/843e986f0a518b1b7eab8f17424241ae.png?size=512"
+            alt="Profile"
+            className="w-8 h-8 rounded-md object-cover"
+            draggable={false}
+          />
+        </button>
 
-          <AnimatePresence>
-            {showProfileMenu && (
+        <AnimatePresence>
+          {showProfileMenu && (
+            <>
               <motion.div
                 initial={{ opacity: 0, x: -10, scale: 0.95 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
+                transition={{ duration: 0.15 }}
+                className="absolute bottom-3 left-[3.25rem] z-50"
+              >
+                <div
+                  className={`
+      w-2 h-2
+      border-t-[1.5px] border-l-[1.5px]
+      border-white/20
+      -rotate-45
+      origin-center
+      transition-all duration-200
+      ${showProfileMenu ? "border-white/40" : ""}
+    `}
+                />
+              </motion.div>
+
+              <motion.div
+                ref={dropdownRef}
+                initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
                 className="absolute left-14 bottom-0 z-50"
               >
                 <GlassContainer className="w-44 rounded-md bg-glass-noise overflow-hidden">
@@ -109,7 +149,7 @@ const Sidebar: React.FC = () => {
                       <img
                         src="https://cdn.discordapp.com/avatars/903815911830589462/843e986f0a518b1b7eab8f17424241ae.png?size=512"
                         alt="Profile"
-                        className="w-8 h-8 rounded-full object-cover"
+                        className="w-8 h-8 rounded-lg object-cover"
                         draggable={false}
                       />
                       <div className="flex flex-col">
@@ -139,9 +179,9 @@ const Sidebar: React.FC = () => {
                   </div>
                 </GlassContainer>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
