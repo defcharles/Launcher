@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import GlassContainer from "../Global/GlassContainer";
-import { Github } from "lucide-react";
+import { Github, GithubIcon } from "lucide-react";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { GrGithub } from "react-icons/gr";
 
 interface Commit {
   sha: string;
@@ -64,7 +65,7 @@ const GithubChangelogs: React.FC<{
       style={{ minWidth: 300 }}
     >
       <h2 className="flex flex-row gap-2 items-center justify-start text-white">
-        <Github /> Launcher Updates
+        <GrGithub className="w-5 h-5" /> Launcher Updates
       </h2>
       <div className="grid grid-cols-2 gap-2">
         {commits.map(({ sha, commit }) => (

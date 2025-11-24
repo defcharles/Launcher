@@ -82,11 +82,7 @@ const Banner: React.FC = () => {
           </motion.p>
 
           <div className="flex items-center justify-between pt-2">
-            <button
-              className="px-6 py-2 bg-gray-500/10 bg-clip-padding backdrop-filter backdrop-blur-lg
-         backdrop-saturate-100 backdrop-contrast-100 bg-glass-noise
-        shadow-xl border border-white/20 text-white rounded-md text-sm transition-all"
-            >
+            <button className="px-6 py-2 bg-white/10 cursor-pointer hover:bg-white/20 border border-white/20 text-white rounded-md font-semibold text-sm transition-all flex items-center gap-2 backdrop-blur-sm hover:scale-105 active:scale-95">
               Play Now
             </button>
             <div className="flex items-center gap-2">
