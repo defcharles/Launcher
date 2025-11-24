@@ -19,7 +19,7 @@ const Frame: React.FC = () => {
 
         <button
           onClick={() => Window.getCurrent().close()}
-          className="cursor-pointer w-10 h-full flex justify-center items-center hover:bg-red-500/50 transition-all rounded-sm hover:backdrop-blur-2xl duration-220"
+          className="cursor-pointer w-10 h-7 flex justify-center items-center hover:bg-red-500/50 transition-all rounded-sm hover:backdrop-blur-2xl duration-220"
         >
           <HiX />
         </button>
