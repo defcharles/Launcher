@@ -15,10 +15,9 @@ interface Commit {
 }
 
 const GithubChangelogs: React.FC<{
-  token: string;
   className?: string;
   onClick?: () => void;
-}> = ({ token, className = "", onClick }) => {
+}> = ({ className = "", onClick }) => {
   const [commits, setCommits] = useState<Commit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +35,7 @@ const GithubChangelogs: React.FC<{
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, []);
 
   if (loading)
     return (
