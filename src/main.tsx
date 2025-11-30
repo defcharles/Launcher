@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Sidebar from "./components/Core/Sidebar";
 import Home from "./pages/Home";
 import Library from "./pages/Library";
+import Settings from "./pages/Settings";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -36,6 +37,7 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/home" element={<Home />} />
         <Route path="/library" element={<Library />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </>
   );
