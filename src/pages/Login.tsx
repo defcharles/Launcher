@@ -4,29 +4,30 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import GlassContainer from "../components/Global/GlassContainer";
-import { Stellar } from "@/stellar/Requests";
 import { open } from "@tauri-apps/plugin-shell";
+import { Stellar } from "@/stellar";
+import { useRoutingStore } from "@/zustand/RoutingStore";
 
 const Login: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
+  const Routing = useRoutingStore();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowWelcome(false);
-    }, 2400);
+    (async () => {
+      await Routing.initRouting(["auth", "public"]);
+    })();
+
+    const timer = setTimeout(() => setShowWelcome(false), 2400);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleClick = async () => {
-    Stellar.Requests.get<{ url: string }>(
-      "https://prod-api-v1.stellarfn.dev/stellar/launcher/data?type=auth"
-    ).then((res) => {
-      if (res.ok) {
-        open(res.data.url);
-      } else {
-        console.error("failed to get auth URL:", res.status);
-      }
-    });
+  const handleClick = () => {
+    const authRoute = Routing.Routes.get("auth");
+    if (authRoute) {
+      open(authRoute.url);
+    } else {
+      console.error("route not found");
+    }
   };
 
   return (

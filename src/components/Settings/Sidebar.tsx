@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Wrench, User, Palette, Settings } from "lucide-react";
+import { Wrench, User, Palette, Settings } from "lucide-react";
 import GlassContainer from "../Global/GlassContainer";
 
 export const SettingsTopBar: React.FC<{
