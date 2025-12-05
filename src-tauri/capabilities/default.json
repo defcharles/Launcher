@@ -2,7 +2,9 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
@@ -19,7 +21,13 @@
     "shell:default",
     {
       "identifier": "http:default",
-      "allow": [{ "url": "https://*.stellarfn.dev" }]
-    }
+      "allow": [
+        {
+          "url": "https://*.stellarfn.dev"
+        }
+      ]
+    },
+    "deep-link:default",
+    "log:default"
   ]
 }

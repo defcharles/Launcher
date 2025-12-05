@@ -6,11 +6,13 @@ import { TbSettings, TbLogout } from "react-icons/tb";
 import { motion, easeOut, AnimatePresence } from "framer-motion";
 import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import GlassContainer from "../Global/GlassContainer";
+import { useAuthStore } from "@/zustand/AuthStore";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const AuthStore = useAuthStore();
 
   const profileRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -105,7 +107,7 @@ const Sidebar: React.FC = () => {
           className={`${baseButton} ${hoverButton} overflow-visible relative`}
         >
           <img
-            src="https://cdn.discordapp.com/avatars/903815911830589462/a_0eb9ae578f957c358faa1c7f449dbecd.gif?size=512"
+            src={AuthStore.account?.ProfilePicture ?? "/StellarStar.png"}
             alt="avatar"
             className="w-8 h-8 rounded-md object-cover"
             draggable={false}
@@ -154,14 +156,17 @@ const Sidebar: React.FC = () => {
                     <div className="p-2.5 px-3 border-b border-white/10">
                       <div className="flex items-center gap-2.5">
                         <img
-                          src="https://cdn.discordapp.com/avatars/903815911830589462/a_0eb9ae578f957c358faa1c7f449dbecd.gif?size=512"
+                          src={
+                            AuthStore.account?.ProfilePicture ??
+                            "/StellarStar.png"
+                          }
                           alt="avatar"
                           className="w-8 h-8 rounded-lg object-cover"
                           draggable={false}
                         />
                         <div className="flex flex-col">
                           <h3 className="font-medium text-white text-sm">
-                            andr1ww
+                            {AuthStore.account?.DisplayName}
                           </h3>
                         </div>
                       </div>

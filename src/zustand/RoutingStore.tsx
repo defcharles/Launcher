@@ -19,10 +19,15 @@ const parseUrl = (url: string) => {
   }
 };
 
+type StoredRoute = {
+  type: string;
+  route: IRoute;
+};
+
 export const useRoutingStore = create<RoutingStore>((set, get) => {
-  const stored = Stellar.Storage.get<IRoute[]>("routing.store") || [];
+  const stored = Stellar.Storage.get<StoredRoute[]>("routing.store") || [];
   const map = new Map(
-    Array.isArray(stored) ? stored.map((r) => [r.parsed.path, r]) : []
+    Array.isArray(stored) ? stored.map((s) => [s.type, s.route]) : []
   );
 
   return {
@@ -32,8 +37,17 @@ export const useRoutingStore = create<RoutingStore>((set, get) => {
         url,
         parsed: parseUrl(url),
       }));
-      const m = new Map(arr.map((r) => [r.parsed.path, r]));
-      Stellar.Storage.set("routing.store", arr);
+      const m = new Map(
+        Object.entries(routes).map(([type, url]) => [
+          type,
+          { url, parsed: parseUrl(url) },
+        ])
+      );
+      const toStore = Array.from(m.entries()).map(([type, route]) => ({
+        type,
+        route,
+      }));
+      Stellar.Storage.set("routing.store", toStore);
       set({ Routes: m });
     },
     addRoute: (type, url) =>
@@ -41,14 +55,22 @@ export const useRoutingStore = create<RoutingStore>((set, get) => {
         const r: IRoute = { url, parsed: parseUrl(url) };
         const m = new Map(state.Routes);
         m.set(type, r);
-        Stellar.Storage.set("routing.store", Array.from(m.values()));
+        const toStore = Array.from(m.entries()).map(([type, route]) => ({
+          type,
+          route,
+        }));
+        Stellar.Storage.set("routing.store", toStore);
         return { Routes: m };
       }),
     removeRoute: (type) =>
       set((state) => {
         const m = new Map(state.Routes);
         m.delete(type);
-        Stellar.Storage.set("routing.store", Array.from(m.values()));
+        const toStore = Array.from(m.entries()).map(([type, route]) => ({
+          type,
+          route,
+        }));
+        Stellar.Storage.set("routing.store", toStore);
         return { Routes: m };
       }),
     initRouting: async (types) => {
@@ -64,8 +86,12 @@ export const useRoutingStore = create<RoutingStore>((set, get) => {
       }
       if (!routes.length) return Array.from(get().Routes.values());
       const m = new Map(types.map((t, i) => [t, routes[i]]));
+      const toStore = Array.from(m.entries()).map(([type, route]) => ({
+        type,
+        route,
+      }));
       set({ Routes: m });
-      Stellar.Storage.set("routing.store", routes);
+      Stellar.Storage.set("routing.store", toStore);
       return routes;
     },
   };

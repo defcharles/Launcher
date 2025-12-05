@@ -6,7 +6,8 @@ export class Storage {
     }
 
     static set<T>(key: string, value: T): void {
-        localStorage.setItem(this.key(key), JSON.stringify(value));
+        const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+        localStorage.setItem(this.key(key), stringValue);
     }
 
     static get<T>(key: string, defaultValue?: T): T | null {
@@ -16,14 +17,13 @@ export class Storage {
         try {
             return JSON.parse(raw) as T;
         } catch {
-            return defaultValue ?? null;
+            return raw as T;
         }
     }
 
     static remove(key: string): void {
         localStorage.removeItem(this.key(key));
     }
-
 
     static clear(): void {
         const remove: string[] = [];

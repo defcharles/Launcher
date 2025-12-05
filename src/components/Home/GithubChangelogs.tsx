@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import GlassContainer from "../Global/GlassContainer";
-import { Github, GithubIcon } from "lucide-react";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { GrGithub } from "react-icons/gr";
+import { Stellar } from "@/stellar";
+import { useRoutingStore } from "@/zustand/RoutingStore";
 
 interface Commit {
   sha: string;
@@ -22,21 +23,27 @@ const GithubChangelogs: React.FC<{
   const [commits, setCommits] = useState<Commit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const Routing = useRoutingStore();
 
   useEffect(() => {
-    fetch("https://prod-api-v1.stellarfn.dev/stellar/launcher/v1/github", {
-      headers: {
-        Accept: "application/vnd.github+json",
-      },
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error("Failed to fetch commits");
-        const data = await res.json();
-        setCommits(data);
+    const publicRoute = Routing.Routes.get("public");
+    if (!publicRoute) {
+      setError("error: route not found");
+      setLoading(false);
+      return;
+    }
+
+    Stellar.Requests.get<any[]>(`${publicRoute.url}/github`)
+      .then((res) => {
+        if (res.ok && res.data) {
+          setCommits(res.data);
+        } else {
+          setError("failed to fetch commits");
+        }
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [Routing]);
 
   if (loading)
     return (

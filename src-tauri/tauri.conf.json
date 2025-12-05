@@ -9,6 +9,13 @@
     "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist"
   },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["stellar"]
+      }
+    }
+  },
   "app": {
     "windows": [
       {
@@ -23,11 +30,11 @@
       }
     ],
     "security": {
-      "csp": null,
       "assetProtocol": {
-        "enable": true,
-        "scope": ["**"]
-      }
+        "scope": ["*/**"],
+        "enable": true
+      },
+      "csp": null
     }
   },
   "bundle": {

@@ -1,7 +1,9 @@
 import React from "react";
 import GlassContainer from "../Global/GlassContainer";
+import { useAuthStore } from "@/zustand/AuthStore";
 
 const Header: React.FC = () => {
+  const AuthStore = useAuthStore();
   return (
     <div className="w-full flex justify-between items-center gap-2 mt-2">
       <div className="min-w-[120px]"></div>
@@ -11,7 +13,7 @@ const Header: React.FC = () => {
           <div className="flex items-center gap-3">
             <div className="relative">
               <img
-                src="https://cdn.discordapp.com/avatars/903815911830589462/843e986f0a518b1b7eab8f17424241ae.png?size=512"
+                src={AuthStore.account?.ProfilePicture || "/StellarStar.png"}
                 alt="pfp"
                 className="w-10 h-10 rounded-full object-cover"
               />

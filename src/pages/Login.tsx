@@ -5,16 +5,21 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import GlassContainer from "../components/Global/GlassContainer";
 import { open } from "@tauri-apps/plugin-shell";
-import { Stellar } from "@/stellar";
 import { useRoutingStore } from "@/zustand/RoutingStore";
+import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "@/zustand/AuthStore";
 
 const Login: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const Routing = useRoutingStore();
+  const AuthStore = useAuthStore();
+  const nav = useNavigate();
 
   useEffect(() => {
     (async () => {
-      await Routing.initRouting(["auth", "public"]);
+      await Routing.initRouting(["auth", "public", "account"]);
+      AuthStore.init();
     })();
 
     const timer = setTimeout(() => setShowWelcome(false), 2400);
@@ -29,6 +34,23 @@ const Login: React.FC = () => {
       console.error("route not found");
     }
   };
+
+  useEffect(() => {
+    onOpenUrl(async (urls: string[]) => {
+      urls.forEach(async (url) => {
+        if (url.startsWith("stellar://")) {
+          let jwt = url.split("stellar://")[1];
+          if (jwt.endsWith("/")) jwt = jwt.slice(0, -1);
+
+          if (await AuthStore.login(jwt)) {
+            nav("/home");
+          }
+        }
+      });
+    });
+
+    return () => {};
+  }, [nav]);
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden">

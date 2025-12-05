@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import Banner from "../components/Home/Banner";
 import Stats from "../components/Home/Stats";
 import GithubChangelogs from "../components/Home/GithubChangelogs";
+import { useAuthStore } from "@/zustand/AuthStore";
 
 const getGreeting = (): string => {
   const hour = new Date().getHours();
@@ -18,6 +19,8 @@ const getGreeting = (): string => {
 
 const Home: React.FC = () => {
   const greeting = getGreeting();
+  const AuthStore = useAuthStore();
+  console.log(AuthStore.account);
 
   return (
     <motion.div
@@ -32,7 +35,10 @@ const Home: React.FC = () => {
       <div className="w-full flex flex-col gap-5 py-5 z-10 h-full">
         <div>
           <h2 className="text-xl font-normal flex flex-row gap-1.5 text-white">
-            {greeting}, <p className="font-bold text-[#274799]">andr1ww!</p>
+            {greeting},{" "}
+            <p className="font-bold text-[#274799]">
+              {AuthStore.account?.DisplayName}!
+            </p>
           </h2>
           <p className="text-white font-normal text-sm">0 Players Online</p>
         </div>
