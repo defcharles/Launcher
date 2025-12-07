@@ -4,8 +4,6 @@ import { GoHomeFill } from "react-icons/go";
 import { LibraryBig } from "lucide-react";
 import { TbSettings, TbLogout } from "react-icons/tb";
 import { motion, easeOut, AnimatePresence } from "framer-motion";
-import { FiChevronDown, FiChevronRight } from "react-icons/fi";
-import GlassContainer from "../Global/GlassContainer";
 import { useAuthStore } from "@/zustand/AuthStore";
 
 const Sidebar: React.FC = () => {

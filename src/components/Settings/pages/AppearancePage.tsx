@@ -1,5 +1,3 @@
-import React from "react";
-
 export const AppearancePage = () => {
   return (
     <div className="flex flex-col gap-2 text-white/80">

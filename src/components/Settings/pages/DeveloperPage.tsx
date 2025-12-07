@@ -1,6 +1,3 @@
-import React, { useState } from "react";
-import { Option } from "../Option";
-
 export const DeveloperPage = () => {
   return (
     <div className="flex flex-col gap-3 text-white/80">

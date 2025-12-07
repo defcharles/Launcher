@@ -33,10 +33,6 @@ export const useRoutingStore = create<RoutingStore>((set, get) => {
   return {
     Routes: map,
     setRoutes: (routes) => {
-      const arr = Object.entries(routes).map(([type, url]) => ({
-        url,
-        parsed: parseUrl(url),
-      }));
       const m = new Map(
         Object.entries(routes).map(([type, url]) => [
           type,

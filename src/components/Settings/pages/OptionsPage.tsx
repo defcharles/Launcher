@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Option } from "../Option";
 
 export const OptionsPage = () => {
