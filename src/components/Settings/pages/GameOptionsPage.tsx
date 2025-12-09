@@ -101,7 +101,7 @@ export const GameOptionsPage = () => {
         </GlassContainer>
       </div>
 
-      <div>
+      {/* <div>
         <h3 className="text-md font-semibold text-white mb-1">
           Preferred Item Slots
         </h3>
@@ -146,11 +146,6 @@ export const GameOptionsPage = () => {
                       alt={item.name}
                       className="w-[85px] h-[85px] object-contain"
                     />
-                    {/* <div className="absolute bottom-2 text-center px-2"> idk how to feel abt this yet
-                      <p className="text-xs font-mono text-white line-clamp-1">
-                        {item.name}
-                      </p>
-                    </div> */}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-1">
@@ -159,6 +154,55 @@ export const GameOptionsPage = () => {
                   </div>
                 )}
               </motion.button>
+            );
+          })}
+        </div>
+      </div> */}
+
+      <div>
+        <h3 className="text-md font-semibold text-white mb-1">
+          Preferred Item Slots{" "}
+          <span className="text-yellow-400/70 text-sm">(In Development)</span>
+        </h3>
+        <p className="text-xs text-white/40 mb-3">
+          This feature is currently in the works, check back later!
+        </p>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-5 pointer-events-none opacity-50">
+          {loadout.map((itemId, index) => {
+            const item = getItemById(itemId);
+
+            return (
+              <div
+                key={index}
+                className={`
+            relative flex flex-col items-center justify-center p-4 rounded-xl border-2 aspect-square
+            ${
+              item
+                ? "border-white/40 bg-gradient-to-br from-white/10 to-white/5"
+                : "border-white/20 bg-white/5"
+            }
+          `}
+              >
+                <div className="absolute top-2 left-2 w-4 h-4 rounded-full bg-gradient-to-br from-white/30 to-white/10 flex items-center justify-center border border-white/40">
+                  <span className="text-white/70 text-xs font-bold">
+                    {index + 1}
+                  </span>
+                </div>
+
+                {item ? (
+                  <img
+                    src={item.src}
+                    alt={item.name}
+                    className="w-[85px] h-[85px] object-contain"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-1">
+                    <span className="text-white/40 text-3xl">+</span>
+                    <span className="text-white/30 text-xs">Select</span>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
