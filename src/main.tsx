@@ -8,6 +8,8 @@ import Sidebar from "./components/Core/Sidebar";
 import Home from "./pages/Home";
 import Library from "./pages/Library";
 import Settings from "./pages/Settings";
+import { useToastStore } from "./zustand/ToastStore";
+import { ToastContainer } from "./components/Global/Toast";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -15,6 +17,8 @@ const root = ReactDOM.createRoot(
 
 const App = () => {
   const location = useLocation();
+  const { toasts, removeToast } = useToastStore();
+
   return (
     <>
       <svg style={{ position: "absolute", width: 0, height: 0 }}>
@@ -39,6 +43,8 @@ const App = () => {
         <Route path="/library" element={<Library />} />
         <Route path="/settings" element={<Settings />} />
       </Routes>
+
+      <ToastContainer toasts={toasts} onClose={removeToast} />
     </>
   );
 };

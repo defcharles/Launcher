@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Wrench, User, Palette, Settings } from "lucide-react";
+import { Wrench, Settings, Gamepad } from "lucide-react";
 import GlassContainer from "../Global/GlassContainer";
 
 export const SettingsTopBar: React.FC<{
@@ -8,9 +8,8 @@ export const SettingsTopBar: React.FC<{
   active?: string;
 }> = ({ onSelect, active }) => {
   const sections = [
-    { name: "Appearance", icon: <Palette size={15} /> },
-    { name: "Account", icon: <User size={15} /> },
-    { name: "Options", icon: <Settings size={15} /> },
+    { name: "Game Options", icon: <Gamepad size={15} /> },
+    // { name: "Options", icon: <Settings size={15} /> },
     { name: "Developer", icon: <Wrench size={15} /> },
   ];
 

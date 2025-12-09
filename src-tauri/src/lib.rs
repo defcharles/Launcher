@@ -36,7 +36,8 @@ pub fn run() {
                 commands::builds::search_for_version,
                 commands::builds::check_file_exists_and_size,
                 commands::builds::check_file_exists,
-                commands::builds::launch
+                commands::builds::launch,
+                commands::builds::exit_all
             ]
         )
         .run(tauri::generate_context!())

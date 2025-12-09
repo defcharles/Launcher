@@ -2,6 +2,7 @@ import { Stellar } from "@/stellar";
 import { useAuthStore } from "@/zustand/AuthStore";
 import BuildStore, { IBuild } from "@/zustand/BuildStore";
 import { useRoutingStore } from "@/zustand/RoutingStore";
+import { useToastStore } from "@/zustand/ToastStore";
 import { window } from "@tauri-apps/api";
 import { invoke } from "@tauri-apps/api/core";
 import { join } from "@tauri-apps/api/path";
@@ -10,16 +11,13 @@ import { sendNotification } from "@tauri-apps/plugin-notification";
 export const handlePlay = async (selectedPath: string) => {
   const authState = useAuthStore.getState();
   const buildstate = BuildStore.getState();
+  const { addToast } = useToastStore.getState();
 
   const path = selectedPath.replace("/", "\\");
   const access_token = authState.jwt;
 
   if (!access_token) {
-    sendNotification({
-      title: "Stellar",
-      body: "You are not authenticated!",
-      sound: "ms-winsoundevent:Notification.Default",
-    });
+    addToast("You are not authenticated!", "error");
     return false;
   }
 
@@ -35,21 +33,13 @@ export const handlePlay = async (selectedPath: string) => {
     () => false
   )) as boolean;
   if (!exists) {
-    sendNotification({
-      title: "Stellar",
-      body: "Build does not exist / is corrupted!",
-      sound: "ms-winsoundevent:Notification.Default",
-    });
+    addToast("Build does not exist / is corrupted!", "error");
     return false;
   }
 
   const build: IBuild | undefined = buildstate.builds.get(selectedPath);
   if (!build) {
-    sendNotification({
-      title: "Stellar",
-      body: `Build with path ${selectedPath} not found!`,
-      sound: "ms-winsoundevent:Notification.Default",
-    });
+    addToast(`Build with path ${selectedPath} not found!`, "error");
     return false;
   }
 
@@ -97,17 +87,14 @@ export const handlePlay = async (selectedPath: string) => {
         window.getCurrentWindow().minimize();
       } else {
         console.log(res.data);
+        addToast("Failed to authenticate with server", "error");
       }
     });
 
     return result;
   } catch (error) {
     console.error(`error launching ${build.version}:`, error);
-    sendNotification({
-      title: "Stellar",
-      body: `Failed to launch ${build.version}!`,
-      sound: "ms-winsoundevent:Notification.Default",
-    });
+    addToast(`Failed to launch ${build.version}!`, "error");
 
     BuildStore.setState((state) => {
       const builds = new Map(state.builds);

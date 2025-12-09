@@ -1,9 +1,10 @@
-use std::fs::File;
+use crate::commands::download::download_file;
+use std::{ fs::File, os::windows::process::CommandExt };
 use std::io::Read;
 use std::path::PathBuf;
-use winapi::um::winbase::CREATE_SUSPENDED;
 use std::process::Stdio;
-use crate::commands::download::download_file;
+use sysinfo::{ System, SystemExt };
+use winapi::um::winbase::CREATE_SUSPENDED;
 
 #[cfg(target_os = "windows")]
 const CREATE_NO_WINDOW: u32 = 0x08000000;
@@ -239,4 +240,36 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
     }
 
     Ok(true)
+}
+
+#[tauri::command]
+pub fn exit_all() {
+    let mut system = System::new_all();
+
+    system.refresh_all();
+
+    let processes = vec![
+        "EpicGamesLauncher.exe",
+        "FortniteLauncher.exe",
+        "FortniteClient-Win64-Shipping_EAC.exe",
+        "FortniteClient-Win64-Shipping.exe",
+        "FortniteClient-Win64-Shipping_BE.exe",
+        "EasyAntiCheat_EOS.exe",
+        "EpicWebHelper.exe",
+        "EACStrapper.exe"
+    ];
+
+    for process in processes.iter() {
+        let mut cmd = std::process::Command::new("taskkill");
+
+        cmd.arg("/F");
+
+        cmd.arg("/IM");
+
+        cmd.arg(process);
+
+        cmd.creation_flags(CREATE_NO_WINDOW);
+
+        cmd.spawn().unwrap();
+    }
 }

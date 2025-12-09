@@ -38,6 +38,7 @@ export const handleClose = async (selectedPath: string) => {
 
   try {
     build.open = false;
+    await invoke("exit_all", {});
   } catch (error) {
     console.error(`error launching ${build.version}:`, error);
     sendNotification({
