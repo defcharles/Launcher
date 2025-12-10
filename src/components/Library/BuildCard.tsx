@@ -27,7 +27,14 @@ const BuildCard: React.FC<{
   const hasSplash = build.splash && build.splash !== "no splash";
 
   return (
-    <GlassContainer className="relative w-full h-[260px] 2xl:h-[320px] rounded-md border border-white/25 bg-gradient-to-t from-black/40 to-transparent overflow-hidden shadow-lg group">
+    <GlassContainer
+      onClick={() => {
+        // some ppl could get confused cuz the play button is there after hover so
+        if (build.open) return onClose(path);
+        if (!build.loading) return onPlay(path);
+      }}
+      className="relative w-full h-[260px] 2xl:h-[320px] rounded-md border border-white/25 bg-gradient-to-t from-black/40 to-transparent overflow-hidden shadow-lg group"
+    >
       {!isLoaded && (
         <div className="absolute inset-0 bg-gradient-to-br from-slate-700/50 to-slate-900/50 flex items-center justify-center z-20">
           <span className="text-white/30 text-sm">Loading Splash...</span>
