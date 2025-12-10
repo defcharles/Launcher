@@ -1,6 +1,6 @@
 "use client";
 
-import type React from "react";
+// import type React from "react";
 
 import { useState } from "react";
 import GlassContainer from "@/components/Global/GlassContainer";
@@ -48,9 +48,9 @@ export const GameOptionsPage = () => {
     null,
   ]);
 
-  const handleSlotClick = (index: number) => {
-    setSelectedSlot(index);
-  };
+  // const handleSlotClick = (index: number) => {
+  //   setSelectedSlot(index);
+  // };
 
   const handleItemSelect = (itemId: string) => {
     if (selectedSlot === null) return;
@@ -67,12 +67,12 @@ export const GameOptionsPage = () => {
     setSelectedSlot(null);
   };
 
-  const clearSlot = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newLoadout = [...loadout];
-    newLoadout[index] = null;
-    setLoadout(newLoadout);
-  };
+  // const clearSlot = (index: number, e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  //   const newLoadout = [...loadout];
+  //   newLoadout[index] = null;
+  //   setLoadout(newLoadout);
+  // };
 
   const getItemById = (id: string | null) => {
     if (!id) return null;

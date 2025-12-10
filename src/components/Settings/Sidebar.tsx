@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Wrench, Settings, Gamepad } from "lucide-react";
+import { Wrench, Gamepad } from "lucide-react";
 import GlassContainer from "../Global/GlassContainer";
 import { useAuthStore } from "@/zustand/AuthStore";
 
