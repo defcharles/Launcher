@@ -9,6 +9,8 @@ import { useRoutingStore } from "@/zustand/RoutingStore";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/zustand/AuthStore";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 const Login: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -20,6 +22,36 @@ const Login: React.FC = () => {
     (async () => {
       await Routing.initRouting(["auth", "public", "account", "oauth"]);
       AuthStore.init();
+
+      const update = await check();
+      if (update) {
+        // https://v2.tauri.app/plugin/updater/#checking-for-updates
+        console.log(
+          `found update ${update.version} from ${update.date} with notes ${update.body}`
+        );
+        let downloaded = 0;
+        let contentLength: number | undefined = 0;
+        await update.downloadAndInstall((event) => {
+          switch (event.event) {
+            case "Started":
+              contentLength = event.data.contentLength;
+              console.log(
+                `started downloading ${event.data.contentLength} bytes`
+              );
+              break;
+            case "Progress":
+              downloaded += event.data.chunkLength;
+              console.log(`downloaded ${downloaded} from ${contentLength}`);
+              break;
+            case "Finished":
+              console.log("download finished");
+              break;
+          }
+        });
+
+        console.log("update installed");
+        await relaunch();
+      }
     })();
 
     const status = async (): Promise<Boolean> => {

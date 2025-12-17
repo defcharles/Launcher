@@ -1,9 +1,9 @@
 use crate::commands::download::download_file;
-use std::{ fs::File, os::windows::process::CommandExt };
 use std::io::Read;
 use std::path::PathBuf;
 use std::process::Stdio;
-use sysinfo::{ System, SystemExt };
+use std::{fs::File, os::windows::process::CommandExt};
+use sysinfo::{System, SystemExt};
 use winapi::um::winbase::CREATE_SUSPENDED;
 
 #[cfg(target_os = "windows")]
@@ -54,8 +54,8 @@ pub fn search_for_version(path: &str) -> Result<Vec<String>, String> {
     file.read_to_end(&mut buffer).map_err(|e| e.to_string())?;
 
     let pattern = [
-        0x2b, 0x00, 0x2b, 0x00, 0x46, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x74, 0x00, 0x6e, 0x00, 0x69, 0x00,
-        0x74, 0x00, 0x65, 0x00, 0x2b, 0x00,
+        0x2b, 0x00, 0x2b, 0x00, 0x46, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x74, 0x00, 0x6e, 0x00, 0x69,
+        0x00, 0x74, 0x00, 0x65, 0x00, 0x2b, 0x00,
     ];
 
     let mut matches = Vec::new();
@@ -69,7 +69,7 @@ pub fn search_for_version(path: &str) -> Result<Vec<String>, String> {
                 let utf16_slice = unsafe {
                     std::slice::from_raw_parts(
                         buffer[i..i + pattern.len() + end].as_ptr() as *const u16,
-                        (pattern.len() + end) / 2
+                        (pattern.len() + end) / 2,
                     )
                 };
                 let s = String::from_utf16_lossy(utf16_slice);
@@ -115,7 +115,7 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
 
     let mut game_dll = game_path.clone();
     game_dll.push(
-        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll"
+        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll",
     );
 
     if game_dll.exists() {
@@ -130,7 +130,10 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
                 Err(e) => {
                     a += 1;
                     if a >= max {
-                        return Err(format!("failed to remove gfsdk after {} attempts: {}", max, e));
+                        return Err(format!(
+                            "failed to remove gfsdk after {} attempts: {}",
+                            max, e
+                        ));
                     }
                     if !game_dll.exists() {
                         break;
@@ -152,7 +155,7 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
 
     let mut game_dll = game_path.clone();
     game_dll.push(
-        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll"
+        "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll",
     );
 
     let _ = download_file("https://cdn.stellarfn.dev/DidYOuTestMe.dll", &game_dll);
@@ -190,24 +193,21 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
     {
         use std::os::windows::process::CommandExt;
 
-        let _fort = std::process::Command
-            ::new(game_real)
+        let _fort = std::process::Command::new(game_real)
             .creation_flags(CREATE_NO_WINDOW)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _fnlauncherfr = std::process::Command
-            ::new(fnlauncher)
+        let _fnlauncherfr = std::process::Command::new(fnlauncher)
             .creation_flags(CREATE_NO_WINDOW | CREATE_SUSPENDED)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _ac = std::process::Command
-            ::new(fnac)
+        let _ac = std::process::Command::new(fnac)
             .creation_flags(CREATE_NO_WINDOW | CREATE_SUSPENDED)
             .args(&fort_args)
             .stdout(Stdio::piped())
@@ -217,22 +217,19 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
 
     #[cfg(not(target_os = "windows"))]
     {
-        let _fn = std::process::Command
-            ::new(game_real)
+        let _fn = std::process::Command::new(game_real)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _fnlauncherfr = std::process::Command
-            ::new(fnlauncher)
+        let _fnlauncherfr = std::process::Command::new(fnlauncher)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
             .map_err(|e| format!("Failed to start Stellar: {}", e))?;
 
-        let _ac = std::process::Command
-            ::new(fnac)
+        let _ac = std::process::Command::new(fnac)
             .args(&fort_args)
             .stdout(Stdio::piped())
             .spawn()
@@ -256,7 +253,7 @@ pub fn exit_all() {
         "FortniteClient-Win64-Shipping_BE.exe",
         "EasyAntiCheat_EOS.exe",
         "EpicWebHelper.exe",
-        "EACStrapper.exe"
+        "EACStrapper.exe",
     ];
 
     for process in processes.iter() {

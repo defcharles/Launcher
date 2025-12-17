@@ -1,5 +1,9 @@
-use std::{ fs::{ self, File }, path::Path, io::Write };
 use serde::Serialize;
+use std::{
+    fs::{self, File},
+    io::Write,
+    path::Path,
+};
 use tauri::Emitter;
 
 #[derive(Clone, Serialize)]
@@ -24,13 +28,11 @@ pub fn download_file(url: &str, dest: &Path) -> Result<(), Box<dyn std::error::E
     let bytes_written = std::io::copy(&mut response, &mut file)?;
     if let Some(expected) = content_length {
         if bytes_written != expected {
-            return Err(
-                format!(
-                    "couldn't complete download: expected {} bytes, got {} bytes",
-                    expected,
-                    bytes_written
-                ).into()
-            );
+            return Err(format!(
+                "couldn't complete download: expected {} bytes, got {} bytes",
+                expected, bytes_written
+            )
+            .into());
         }
     }
     Ok(())
@@ -39,13 +41,13 @@ pub fn download_file(url: &str, dest: &Path) -> Result<(), Box<dyn std::error::E
 #[tauri::command]
 pub async fn get_file_size(url: String) -> Result<u64, String> {
     let client = reqwest::Client::new();
-    let response = client
-        .head(&url)
-        .send().await
-        .map_err(|e| e.to_string())?;
+    let response = client.head(&url).send().await.map_err(|e| e.to_string())?;
 
     if !response.status().is_success() {
-        return Err(format!("Failed to get file size: status {}", response.status()));
+        return Err(format!(
+            "Failed to get file size: status {}",
+            response.status()
+        ));
     }
 
     let size = response.content_length().unwrap_or(0);
@@ -56,7 +58,7 @@ pub async fn get_file_size(url: String) -> Result<u64, String> {
 pub async fn download_file_command(
     url: String,
     dest: String,
-    window: tauri::Window
+    window: tauri::Window,
 ) -> Result<(), String> {
     let dest_path = std::path::PathBuf::from(&dest);
     let file_name = dest_path
@@ -70,23 +72,27 @@ pub async fn download_file_command(
     }
 
     let client = reqwest::Client::new();
-    let mut response = client
-        .get(&url)
-        .send().await
-        .map_err(|e| e.to_string())?;
+    let mut response = client.get(&url).send().await.map_err(|e| e.to_string())?;
 
     if !response.status().is_success() {
-        return Err(format!("failed to download file: status {}", response.status()));
+        return Err(format!(
+            "failed to download file: status {}",
+            response.status()
+        ));
     }
 
     let total_size = response.content_length().unwrap_or(0);
 
-    let mut file = tokio::fs::File::create(&dest_path).await.map_err(|e| e.to_string())?;
+    let mut file = tokio::fs::File::create(&dest_path)
+        .await
+        .map_err(|e| e.to_string())?;
 
     let mut downloaded: u64 = 0;
 
     while let Some(chunk) = response.chunk().await.map_err(|e| e.to_string())? {
-        tokio::io::AsyncWriteExt::write_all(&mut file, &chunk).await.map_err(|e| e.to_string())?;
+        tokio::io::AsyncWriteExt::write_all(&mut file, &chunk)
+            .await
+            .map_err(|e| e.to_string())?;
 
         downloaded += chunk.len() as u64;
 
@@ -96,12 +102,15 @@ pub async fn download_file_command(
             0.0
         };
 
-        let _ = window.emit("download-progress", DownloadProgress {
-            downloaded,
-            total: total_size,
-            percentage,
-            file_name: file_name.clone(),
-        });
+        let _ = window.emit(
+            "download-progress",
+            DownloadProgress {
+                downloaded,
+                total: total_size,
+                percentage,
+                file_name: file_name.clone(),
+            },
+        );
     }
 
     Ok(())

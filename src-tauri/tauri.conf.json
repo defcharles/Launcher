@@ -14,6 +14,13 @@
       "desktop": {
         "schemes": ["stellar"]
       }
+    },
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDUyMTRGQzI0NTJFNEJCODYKUldTR3UrUlNKUHdVVXJvckw1VWs2bWFLK0k0ZWJSdXZUcWZYck5NdXg1VXdaR0ZRMXFqek4vdEwK",
+      "endpoints": ["https://cdn.stellarfn.dev/update.json"],
+      "windows": {
+        "installMode": "passive"
+      }
     }
   },
   "app": {
@@ -42,6 +49,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "icon": ["icons/icon.png", "icons/icon.ico"]
   }
 }
