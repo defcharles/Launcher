@@ -133,7 +133,7 @@ pub fn run_elevated(exe: &str, params: &str, working_dir: Option<&str>) -> Resul
 }
 
 #[tauri::command]
-pub fn launch(code: String, path: String) -> Result<bool, String> {
+pub fn launch(code: String, path: String, extra_args: Vec<String>) -> Result<bool, String> {
     let game_path = PathBuf::from(path);
     // let mut paks_dir = game_path.clone();
     // paks_dir.push("FortniteGame\\Content\\Paks");
@@ -226,6 +226,10 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
         "-AUTH_TYPE=exchangecode"
     ];
 
+    for arg in extra_args.iter() {
+        fort_args.push(arg);
+    }
+
     #[cfg(target_os = "windows")]
     {
         use std::os::windows::process::CommandExt;
@@ -292,61 +296,110 @@ pub fn launch(code: String, path: String) -> Result<bool, String> {
 
 #[tauri::command]
 pub fn exit_all() -> Result<(), String> {
-    use windows::Win32::Foundation::HWND;
-    use windows::Win32::UI::Shell::ShellExecuteW;
-    use windows::Win32::UI::WindowsAndMessaging::SW_HIDE;
-    use windows::core::{ PCWSTR, w };
+    use windows::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot,
+        Process32First,
+        Process32Next,
+        PROCESSENTRY32,
+        TH32CS_SNAPPROCESS,
+    };
+    use windows::Win32::System::Threading::{
+        OpenProcess,
+        TerminateProcess,
+        PROCESS_TERMINATE,
+        PROCESS_QUERY_INFORMATION,
+    };
+    use windows::Win32::Foundation::{ CloseHandle, HANDLE };
+    use std::ffi::OsStr;
+    use std::os::windows::ffi::OsStrExt;
 
-    fn to_utf16_z(s: &str) -> Vec<u16> {
-        use std::os::windows::ffi::OsStrExt;
-        std::ffi::OsStr::new(s).encode_wide().chain(std::iter::once(0)).collect()
-    }
-
-    let processes = [
-        "EpicGamesLauncher.exe",
+    let target_processes = [
+        "FortniteClient-Win64-Shipping.exe",
         "FortniteLauncher.exe",
         "FortniteClient-Win64-Shipping_EAC.exe",
-        "FortniteClient-Win64-Shipping.exe",
         "FortniteClient-Win64-Shipping_BE.exe",
         "EasyAntiCheat_EOS.exe",
         "EpicWebHelper.exe",
         "FortniteClient.exe",
+        "EpicGamesLauncher.exe",
     ];
 
-    let ps_script = format!(
-        "$procs=@({}); foreach($p in $procs){{ \
-            try {{ cmd /c \"taskkill /F /T /IM $p\" 2>$null | Out-Null }} catch {{}} \
-        }}",
-        processes
-            .iter()
-            .map(|p| format!("'{}'", p.replace('\'', "''")))
-            .collect::<Vec<_>>()
-            .join(",")
-    );
+    unsafe {
+        let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0).map_err(|e|
+            format!("failed to create process snapshot: {}", e)
+        )?;
 
-    let exe_w = to_utf16_z("powershell.exe");
-    let params_w = to_utf16_z(
-        &format!(
-            "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command \"{}\"",
-            ps_script.replace('"', "`\"")
-        )
-    );
+        let mut entry = PROCESSENTRY32 {
+            dwSize: std::mem::size_of::<PROCESSENTRY32>() as u32,
+            ..Default::default()
+        };
 
-    let result = unsafe {
-        ShellExecuteW(
-            HWND(std::ptr::null_mut()),
-            w!("runas"),
-            PCWSTR(exe_w.as_ptr()),
-            PCWSTR(params_w.as_ptr()),
-            PCWSTR(std::ptr::null()),
-            SW_HIDE
-        )
-    };
+        if Process32First(snapshot, &mut entry).is_err() {
+            CloseHandle(snapshot);
+            return Err("failed to get first process".to_string());
+        }
 
-    let code = result.0 as isize;
-    if code <= 32 {
-        return Err(format!("ShellExecuteW failed: {}", code));
+        let mut killed_count = 0;
+
+        loop {
+            let null_pos = entry.szExeFile
+                .iter()
+                .position(|&c| c == 0)
+                .unwrap_or(entry.szExeFile.len());
+
+            let utf16_slice: Vec<u16> = entry.szExeFile[..null_pos]
+                .iter()
+                .map(|&b| b as u16)
+                .collect();
+            let process_name = String::from_utf16_lossy(&utf16_slice);
+
+            if target_processes.iter().any(|&target| { process_name.eq_ignore_ascii_case(target) }) {
+                println!("found target process: {} (PID: {})", process_name, entry.th32ProcessID);
+
+                match
+                    OpenProcess(
+                        PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION,
+                        false,
+                        entry.th32ProcessID
+                    )
+                {
+                    Ok(process_handle) => {
+                        match TerminateProcess(process_handle, 1) {
+                            Ok(_) => {
+                                println!("killed: {} (PID: {})", process_name, entry.th32ProcessID);
+                                killed_count += 1;
+                            }
+                            Err(e) => {
+                                println!(
+                                    "failed to kill {} (PID: {}): {}",
+                                    process_name,
+                                    entry.th32ProcessID,
+                                    e
+                                );
+                            }
+                        }
+                        CloseHandle(process_handle);
+                    }
+                    Err(e) => {
+                        println!(
+                            "failed to open process {} (PID: {}): {}",
+                            process_name,
+                            entry.th32ProcessID,
+                            e
+                        );
+                    }
+                }
+            }
+
+            if Process32Next(snapshot, &mut entry).is_err() {
+                break;
+            }
+        }
+
+        CloseHandle(snapshot);
     }
+
+    std::thread::sleep(std::time::Duration::from_millis(1000));
 
     Ok(())
 }

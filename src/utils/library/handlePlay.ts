@@ -154,9 +154,20 @@ export const handlePlay = async (
           });
 
           console.log("authenticated with server, launching...");
+          let extraArgs: string[] = [];
+          const preEdits = Stellar.Storage.get<boolean>("game.disablePreEdits");
+          const resetOnRelease = Stellar.Storage.get<boolean>("game.resetOnRelease");
+          if (preEdits) {
+            extraArgs.push("-dpe");
+          }
+          if (resetOnRelease) {
+            extraArgs.push("-ror");
+          }
+
           await invoke("launch", {
             code: res.data.code,
             path: path,
+            extraArgs,
           });
 
           window.getCurrentWindow().minimize();
