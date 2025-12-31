@@ -356,13 +356,7 @@ pub fn exit_all() -> Result<(), String> {
             if target_processes.iter().any(|&target| { process_name.eq_ignore_ascii_case(target) }) {
                 println!("found target process: {} (PID: {})", process_name, entry.th32ProcessID);
 
-                match
-                    OpenProcess(
-                        PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION,
-                        false,
-                        entry.th32ProcessID
-                    )
-                {
+                match OpenProcess(PROCESS_TERMINATE, false, entry.th32ProcessID) {
                     Ok(process_handle) => {
                         match TerminateProcess(process_handle, 1) {
                             Ok(_) => {
