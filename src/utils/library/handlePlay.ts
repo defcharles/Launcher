@@ -75,6 +75,8 @@ const checkFiles = async (buildPath: string): Promise<boolean> => {
   }
 };
 
+let isLaunching = false; // ts so scuff
+
 export const handlePlay = async (
   selectedPath: string,
   onShowDownloader?: (buildPath: string) => void
@@ -84,6 +86,11 @@ export const handlePlay = async (
     const authState = useAuthStore.getState();
     const buildstate = BuildStore.getState();
     const { addToast } = useToastStore.getState();
+
+    if (isLaunching)
+      return false;
+
+    isLaunching = true;
 
     const path = selectedPath.replace("/", "\\");
     const access_token = authState.jwt;
@@ -172,6 +179,7 @@ export const handlePlay = async (
           });
 
           window.getCurrentWindow().minimize();
+          isLaunching = false;
         } else {
           result = false;
           console.log(res.data);

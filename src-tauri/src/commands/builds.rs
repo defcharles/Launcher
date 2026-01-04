@@ -134,24 +134,9 @@ pub fn run_elevated(exe: &str, params: &str, working_dir: Option<&str>) -> Resul
 
 #[tauri::command]
 pub fn launch(code: String, path: String, extra_args: Vec<String>) -> Result<bool, String> {
+    use std::{ fs, path::PathBuf, process::Stdio };
+
     let game_path = PathBuf::from(path);
-    // let mut paks_dir = game_path.clone();
-    // paks_dir.push("FortniteGame\\Content\\Paks");
-    // if paks_dir.exists() && paks_dir.is_dir() {
-    //     let file_count = match fs::read_dir(&paks_dir) {
-    //         Ok(entries) =>
-    //             entries
-    //                 .filter_map(|e| e.ok())
-    //                 .filter(|e| e.path().is_file())
-    //                 .count(),
-    //         Err(e) => {
-    //             return Err(format!("Failed to read Paks directory: {}", e));
-    //         }
-    //     };
-    //     if file_count > 56 {
-    //         return Err(format!("Too many files in Paks directory ({} files found!", file_count));
-    //     }
-    // }
 
     let mut game_dll = game_path.clone();
     game_dll.push(
@@ -190,15 +175,6 @@ pub fn launch(code: String, path: String, extra_args: Vec<String>) -> Result<boo
         }
     }
 
-    let mut game_dll = game_path.clone();
-    // game_dll.push(
-    //     "Engine\\Binaries\\ThirdParty\\NVIDIA\\NVaftermath\\Win64\\GFSDK_Aftermath_Lib.x64.dll"
-    // );
-
-    // let _ = download_file("https://cdn.stellarfn.dev/DidYOuTestMe.dll", &game_dll);
-
-    //  let _ = std::fs::copy(r"D:\Coding\Arsenic\x64\Stellar\Arsenic.dll", &game_dll);
-
     let mut game_real = game_path.clone();
     game_real.push("FortniteGame\\Binaries\\Win64\\FortniteClient.exe");
     let mut fnlauncher = game_path.clone();
@@ -232,21 +208,29 @@ pub fn launch(code: String, path: String, extra_args: Vec<String>) -> Result<boo
 
     #[cfg(target_os = "windows")]
     {
-        use std::os::windows::process::CommandExt;
+        // use winreg::enums::*;
+        // use winreg::RegKey;
 
-        // let _fort = std::process::Command
-        //     ::new(game_real)
-        //     .creation_flags(CREATE_NO_WINDOW)
-        //     .args(&fort_args)
-        //     .stdout(Stdio::piped())
-        //     .spawn()
-        //     .map_err(|e| format!("Failed to start Stellar: {}", e))?;
+        // let hklm = RegKey::predef(HKEY_LOCAL_MACHINE);
+        // let ifeo_path =
+        //     r"Software\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\FortniteClient.exe";
+
+        // if hklm.open_subkey(ifeo_path).is_err() {
+        //     let reg_exe = r"C:\Windows\System32\reg.exe";
+        //     let params = concat!(
+        //         "add \"HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\FortniteClient.exe\" ",
+        //         "/v MaxLoaderThreads /t REG_DWORD /d 1 /f"
+        //     );
+
+        //     run_elevated(reg_exe, params, None)?;
+        // }
+
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        const CREATE_SUSPENDED: u32 = 0x00000004;
 
         let exe_str = game_real.to_str().ok_or("Invalid executable path")?;
         let params = fort_args.join(" ");
-
         let work_dir = game_real.parent().and_then(|p| p.to_str());
-        println!("work_dir: {:?}", work_dir);
 
         run_elevated(exe_str, &params, work_dir)?;
 
