@@ -3,6 +3,7 @@ import GlassContainer from "../Global/GlassContainer";
 import { invoke } from "@tauri-apps/api/core";
 import { join } from "@tauri-apps/api/path";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { Stellar } from "@/stellar";
 
 const Files: {
   url: string;
@@ -95,6 +96,21 @@ const RequiredFilesDownloader: React.FC<RequiredFilesDownloaderProps> = ({
     try {
       setStatus("checking");
       const filesToDownload: any[] = [];
+      const bubble = Stellar.Storage.get<boolean>("game.bubbleWrapEnabled");
+      if (bubble) {
+        Files.push(
+          {
+            url: "https://cdn.stellarfn.dev/Paks/pakchunkBubbleWrap-WindowsClient_P.pak",
+            fileName: "pakchunkStellarBubble-WindowsClient.pak",
+            dir: "FortniteGame\\Content\\Paks",
+          },
+          {
+            url: "https://cdn.stellarfn.dev/Paks/pakchunkBubbleWrap-WindowsClient_P.sig",
+            fileName: "pakchunkStellarBubble-WindowsClient.sig",
+            dir: "FortniteGame\\Content\\Paks",
+          }
+        );
+      }
 
       for (const file of Files) {
         const directory = await join(

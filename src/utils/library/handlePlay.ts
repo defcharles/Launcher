@@ -37,6 +37,21 @@ const Files: {
 
 const checkFiles = async (buildPath: string): Promise<boolean> => {
   try {
+    const bubble = Stellar.Storage.get<boolean>("game.bubbleWrapEnabled");
+    if (bubble) {
+      Files.push(
+        {
+          url: "https://cdn.stellarfn.dev/Paks/pakchunkBubbleWrap-WindowsClient_P.pak",
+          fileName: "pakchunkStellarBubble-WindowsClient.pak",
+          dir: "FortniteGame\\Content\\Paks",
+        },
+        {
+          url: "https://cdn.stellarfn.dev/Paks/pakchunkBubbleWrap-WindowsClient_P.sig",
+          fileName: "pakchunkStellarBubble-WindowsClient.sig",
+          dir: "FortniteGame\\Content\\Paks",
+        }
+      );
+    }
     for (const file of Files) {
       const directory = await join(
         buildPath,

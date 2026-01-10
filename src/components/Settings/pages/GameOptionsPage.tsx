@@ -37,6 +37,9 @@ export const GameOptionsPage = () => {
   const [resetOnRelease, setResetOnRelease] = useState(
     Stellar.Storage.get("game.resetOnRelease") || false
   );
+  const [bubbleWrapEnabled, setBubbleWrapEnabled] = useState(
+    Stellar.Storage.get("game.bubbleWrapEnabled") || false
+  );
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [loadout, setLoadout] = useState<Array<string | null>>([
     null,
@@ -105,6 +108,14 @@ export const GameOptionsPage = () => {
             onChange={async () => {
               Stellar.Storage.set("game.resetOnRelease", !resetOnRelease);
               setResetOnRelease(!resetOnRelease);
+            }}
+          />
+          <Option
+            label="Bubble Wrap Builds"
+            value={bubbleWrapEnabled}
+            onChange={async () => {
+              Stellar.Storage.set("game.bubbleWrapEnabled", !bubbleWrapEnabled);
+              setBubbleWrapEnabled(!bubbleWrapEnabled);
             }}
           />
         </GlassContainer>
@@ -177,7 +188,7 @@ export const GameOptionsPage = () => {
           This feature is currently in the works, check back later!
         </p>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-5 pointer-events-none opacity-50">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-7 pointer-events-none opacity-50">
           {loadout.map((itemId, index) => {
             const item = getItemById(itemId);
 
